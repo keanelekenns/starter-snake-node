@@ -30,8 +30,8 @@ app.post('/start', (request, response) => {
   // Response data
   const data = {
     color: '#4DC8FF',
-    headType: "pixel",
-    tailType: "pixel"
+    headType: "bendr",
+    tailType: "bolt"
   }
 
   return response.json(data)
@@ -48,7 +48,7 @@ app.post('/move', (request, response) => {
   var choice = 0;
   var snake_move = possible_moves[choice];
 
-  console.log("MOVE: " + snake_move);
+  console.log("MOVE: " + snake_move + "==============================================");
   return response.json({ move: snake_move })
 })
 
