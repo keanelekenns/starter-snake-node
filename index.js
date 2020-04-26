@@ -21,6 +21,31 @@ app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 
+function moveToCoord(move, currentCoord){
+    var newCoord = {...currentCoord};
+    switch (move) {
+      case 'up':
+        newCoord.y++;
+        break;
+      case 'down':
+        newCoord.y--;
+        break;
+      case 'left':
+        newCoord.x--;
+        break;
+      case 'right':
+        newCoord.x++;
+        break;
+      default:
+        return null;
+    }
+    return newCoord;
+}
+
+function isSafeCoord(){
+    
+}
+
 //  This function is called everytime your snake is entered into a game.
 //  cherrypy.request.json contains information about the game that's about to be played.
 // TODO: Use this function to decide how your snake is going to look on the board.
@@ -42,13 +67,11 @@ app.post('/start', (request, response) => {
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
   var data = request.body;
-
-  // Choose a random direction to move in
-  possible_moves = ["up", "down", "left", "right"]
+  moves = ["up", "down", "left", "right"]
   var choice = 0;
-  var snake_move = possible_moves[choice];
-
-  console.log("MOVE: " + snake_move + "==============================================");
+  var snake_move = moves[choice];
+  console.log("CURRENT POSITION: " + data.you.body[0]);
+  console.log("MOVE: " + snake_move );
   return response.json({ move: snake_move })
 })
 
