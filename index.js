@@ -70,7 +70,7 @@ app.post('/move', (request, response) => {
   moves = ["up", "down", "left", "right"]
   var choice = 0;
   var snake_move = moves[choice];
-  console.log("CURRENT POSITION: " + data.you.body[0]);
+  console.log("CURRENT POSITION: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log("MOVE: " + snake_move );
   return response.json({ move: snake_move })
 })
