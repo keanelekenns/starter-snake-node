@@ -29,9 +29,9 @@ app.post('/start', (request, response) => {
 
   // Response data
   const data = {
-    color: '#888888',
-    headType: "regular",
-    tailType: "regular"
+    color: '#4DC8FF',
+    headType: "pixel",
+    tailType: "pixel"
   }
 
   return response.json(data)
@@ -45,7 +45,7 @@ app.post('/move', (request, response) => {
 
   // Choose a random direction to move in
   possible_moves = ["up", "down", "left", "right"]
-  var choice = Math.floor(Math.random() * possible_moves.length);
+  var choice = 0;
   var snake_move = possible_moves[choice];
 
   console.log("MOVE: " + snake_move);
