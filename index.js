@@ -21,6 +21,9 @@ app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 
+var previousMove;
+const moves = ["up", "down", "left", "right"]
+
 function moveToCoord(move, currentCoord){
     var newCoord = {...currentCoord};
     switch (move) {
@@ -67,12 +70,12 @@ app.post('/start', (request, response) => {
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
   var data = request.body;
-  moves = ["up", "down", "left", "right"]
   var choice = 0;
-  var snake_move = moves[choice];
+  var currentMove = moves[choice];
+  console.log("MOVE: " + currentMove );
   console.log("CURRENT POSITION: (" + data.you.body[0].x +","+data.you.body[0].y+")");
-  console.log("MOVE: " + snake_move );
-  return response.json({ move: snake_move })
+  previousMove = currentMove;
+  return response.json({ move: currentMove })
 })
 
 // This function is called when a game your snake was in ends.
