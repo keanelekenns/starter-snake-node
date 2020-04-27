@@ -64,6 +64,7 @@ function reverseMove(move){
 
 function isSafeCoord(coord, board){
     if(coord.x < 0 || coord.y < 0 || coord.x >= board.width || coord.y >= board.height){
+        console.log("HEIGHT "+board.height);
         return false;
     }
     numSnakes = board.snakes.length;
@@ -109,7 +110,7 @@ app.post('/move', (request, response) => {
   var currentMove;
   var currentCoord = data.you.body[0];
   for(;;){
-      let i = Math.floor(Math.random() * 3);
+      let i = Math.floor(Math.random() * validMoves.length);
       if(isSafeCoord(moveToCoord(validMoves[i], currentCoord),data.board)){
           currentMove = validMoves[i];
           break;
