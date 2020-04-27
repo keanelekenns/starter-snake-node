@@ -21,7 +21,7 @@ app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 
-var previousMove;
+var previousMove = "up";
 const moves = ["up", "down", "left", "right"]
 
 function moveToCoord(move, currentCoord){
@@ -48,13 +48,13 @@ function moveToCoord(move, currentCoord){
 function reverseMove(move){
     switch (move) {
       case 'up':
-        return 'down'
+        return 'down';
       case 'down':
-        return 'up'
+        return 'up';
       case 'left':
-        return 'right'
+        return 'right';
       case 'right':
-        return 'left'
+        return 'left';
       default:
         return null;
     }
@@ -86,7 +86,7 @@ app.post('/start', (request, response) => {
   // Response data
   const data = {
     color: '#4DC8FF',
-    headType: "bendr",
+    headType: "silly",
     tailType: "bolt"
   }
 
@@ -98,15 +98,19 @@ app.post('/start', (request, response) => {
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
   var data = request.body;
+  var validMoves = [...moves];
+  let index = moves.indexOf(reverseMove(previousMove));
+  validMoves.splice(index,1);
+  
   var currentCoord = data.you.body[0];
-  var choice = 0;
-  for(let i = 0; i < moves.length; i++){
-      if(moves[i] != reverseMove(previousMove) && isSafeCoord(moveToCoord(moves[i], currentCoord),data.board)){
-          choice = i;
+  for(;;){
+      let i = Math.floor(Math.random() * 3);
+      if(isSafeCoord(moveToCoord(validMoves[i], currentCoord),data.board)){
+          var currentMove = validMoves[i];
           break;
       }
   }
-  var currentMove = moves[choice];
+  
   console.log("MOVE: " + currentMove );
   console.log("CURRENT POSITION: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   previousMove = currentMove;
