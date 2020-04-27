@@ -65,10 +65,10 @@ function isSafeCoord(coord, board){
         return false;
     }
     numSnakes = board.snakes.length;
-    for (int i=0; i < numSnakes; i++){
+    for (let i=0; i < numSnakes; i++){
         currentSnake = board.snakes[i];
-        int snakeSize = currentSnake.body.length;
-        for(int j = 0; j < snakeSize; j++){
+        let snakeSize = currentSnake.body.length;
+        for(let j = 0; j < snakeSize; j++){
             if(currentSnake.body[j].x == coord.x && currentSnake.body[j].y == coord.y){
                 return false;
             }
@@ -100,7 +100,7 @@ app.post('/move', (request, response) => {
   var data = request.body;
   var currentCoord = data.you.body[0];
   var choice = 0;
-  for(int i = 0; i < moves.length; i++){
+  for(let i = 0; i < moves.length; i++){
       if(moves[i] != reverseMove(previousMove) && isSafeCoord(moveToCoord(moves[i], currentCoord),data.board)){
           choice = i;
           break;
