@@ -45,8 +45,36 @@ function moveToCoord(move, currentCoord){
     return newCoord;
 }
 
-function isSafeCoord(){
-    
+function reverseMove(move){
+    switch (move) {
+      case 'up':
+        return 'down'
+      case 'down':
+        return 'up'
+      case 'left':
+        return 'right'
+      case 'right':
+        return 'left'
+      default:
+        return null;
+    }
+}
+
+function isSafeCoord(coord, board){
+    if(coord.x < 0 || coord.y < 0 || coord.x > board.width || coord.y > board.height){
+        return false;
+    }
+    int numSnakes = board.snakes.length;
+    for (int i=0; i < numSnakes; i++){
+        currentSnake = board.snakes[i];
+        int snakeSize = currentSnake.body.length;
+        for(int j = 0; j < snakeSize; j++){
+            if(currentSnake.body[j].x == coord.x && currentSnake.body[j].y == coord.y){
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 //  This function is called everytime your snake is entered into a game.
@@ -70,7 +98,14 @@ app.post('/start', (request, response) => {
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
   var data = request.body;
+  var currentCoord = data.you.body[0];
   var choice = 0;
+  for(int i = 0; i < moves.length; i++){
+      if(moves[i] != reverseMove(previousMove) && isSafeCoord(moveToCoord(moves[i], currentCoord))){
+          choice = i;
+          break;
+      }
+  }
   var currentMove = moves[choice];
   console.log("MOVE: " + currentMove );
   console.log("CURRENT POSITION: (" + data.you.body[0].x +","+data.you.body[0].y+")");
