@@ -26,6 +26,7 @@ const moves = ["up", "down", "left", "right"]
 
 function moveToCoord(move, currentCoord){
     var newCoord = {...currentCoord};
+    console.log("OLD COORD: (" + newCoord.x +"," +newCoord.y+")");
     switch (move) {
       case 'up':
         newCoord.y++;
@@ -42,6 +43,7 @@ function moveToCoord(move, currentCoord){
       default:
         return null;
     }
+    console.log("NEW COORD: (" + newCoord.x +"," +newCoord.y+")");
     return newCoord;
 }
 
@@ -67,7 +69,7 @@ function isSafeCoord(coord, board){
     numSnakes = board.snakes.length;
     for (let i=0; i < numSnakes; i++){
         currentSnake = board.snakes[i];
-        console.log("CHECK SNAKE: ");
+        console.log("CHECK SNAKE "+i+": ");
         let snakeSize = currentSnake.body.length;
         for(let j = 0; j < snakeSize; j++){
             console.log(currentSnake.body[j].x + "," + currentSnake.body[j].y);
