@@ -29,10 +29,10 @@ function moveToCoord(move, currentCoord){
     console.log("OLD COORD: (" + newCoord.x +"," +newCoord.y+")");
     switch (move) {
       case 'up':
-        newCoord.y++;
+        newCoord.y--;
         break;
       case 'down':
-        newCoord.y--;
+        newCoord.y++;
         break;
       case 'left':
         newCoord.x--;
