@@ -67,6 +67,7 @@ function isSafeCoord(coord, board){
     numSnakes = board.snakes.length;
     for (let i=0; i < numSnakes; i++){
         currentSnake = board.snakes[i];
+        console.log("CHECK SNAKE: " + currentSnake);
         let snakeSize = currentSnake.body.length;
         for(let j = 0; j < snakeSize; j++){
             if(currentSnake.body[j].x == coord.x && currentSnake.body[j].y == coord.y){
