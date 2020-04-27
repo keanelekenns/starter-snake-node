@@ -101,7 +101,7 @@ app.post('/move', (request, response) => {
   var currentCoord = data.you.body[0];
   var choice = 0;
   for(int i = 0; i < moves.length; i++){
-      if(moves[i] != reverseMove(previousMove) && isSafeCoord(moveToCoord(moves[i], currentCoord))){
+      if(moves[i] != reverseMove(previousMove) && isSafeCoord(moveToCoord(moves[i], currentCoord),data.board)){
           choice = i;
           break;
       }
