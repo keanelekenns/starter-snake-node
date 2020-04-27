@@ -112,7 +112,8 @@ app.post('/move', (request, response) => {
   }
   
   console.log("MOVE: " + currentMove );
-  console.log("CURRENT POSITION: (" + data.you.body[0].x +","+data.you.body[0].y+")");
+  console.log("CURRENT HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
+  console.log("CURRENT TAIL: (" + data.snakes[0].body[-1].x +","+data.snakes[0].body[-1].y+")");
   previousMove = currentMove;
   return response.json({ move: currentMove })
 })
