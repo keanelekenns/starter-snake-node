@@ -101,15 +101,18 @@ app.post('/start', (request, response) => {
 app.post('/move', (request, response) => {
   var data = request.body;
   var validMoves = [...moves];
-  let index = moves.indexOf(reverseMove(previousMove));
+  var index = moves.indexOf(reverseMove(previousMove));
   validMoves.splice(index,1);
   
+  var currentMove;
   var currentCoord = data.you.body[0];
   for(;;){
       let i = Math.floor(Math.random() * 3);
       if(isSafeCoord(moveToCoord(validMoves[i], currentCoord),data.board)){
-          var currentMove = validMoves[i];
+          currentMove = validMoves[i];
           break;
+      }else{
+          validMoves.splice(i,1);
       }
   }
   
