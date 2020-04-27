@@ -61,7 +61,7 @@ function reverseMove(move){
 }
 
 function isSafeCoord(coord, board){
-    if(coord.x < 0 || coord.y < 0 || coord.x > board.width || coord.y > board.height){
+    if(coord.x < 0 || coord.y < 0 || coord.x >= board.width || coord.y >= board.height){
         return false;
     }
     numSnakes = board.snakes.length;
