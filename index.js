@@ -20,13 +20,13 @@ app.use(bodyParser.json())
 app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
-
+var currentMove;
 var previousMove = "up";
 const moves = ["up", "down", "left", "right"]
 
 function moveToCoord(move, currentCoord){
     var newCoord = {...currentCoord};
-    console.log("OLD COORD: (" + newCoord.x +"," +newCoord.y+")");
+    //console.log("OLD COORD: (" + newCoord.x +"," +newCoord.y+")");
     switch (move) {
       case 'up':
         newCoord.y--;
@@ -43,7 +43,7 @@ function moveToCoord(move, currentCoord){
       default:
         return null;
     }
-    console.log("NEW COORD: (" + newCoord.x +"," +newCoord.y+")");
+    //console.log("NEW COORD: (" + newCoord.x +"," +newCoord.y+")");
     return newCoord;
 }
 
@@ -64,22 +64,46 @@ function reverseMove(move){
 
 function isSafeCoord(coord, board){
     if(coord.x < 0 || coord.y < 0 || coord.x >= board.width || coord.y >= board.height){
-        console.log("HEIGHT "+board.height);
         return false;
     }
-    numSnakes = board.snakes.length;
+    let numSnakes = board.snakes.length;
     for (let i=0; i < numSnakes; i++){
-        currentSnake = board.snakes[i];
-        console.log("CHECK SNAKE "+i+": ");
+        let currentSnake = board.snakes[i];
         let snakeSize = currentSnake.body.length;
         for(let j = 0; j < snakeSize; j++){
-            console.log(currentSnake.body[j].x + "," + currentSnake.body[j].y);
             if(currentSnake.body[j].x == coord.x && currentSnake.body[j].y == coord.y){
                 return false;
             }
         }
     }
     return true;
+}
+//Input:
+//potentialMoves - a list of moves to check
+//startCoord - where to move from
+//board - the current game board
+//Output:
+//safeMoves - a subset of the moves list containing only safe moves
+function safeMoves(potentialMoves, startCoord, board){
+    let safeMoves = [...potentialMoves];
+    let coords = safeMoves.map( function(x) { return moveToCoord(x, startCoord); });
+    for(let i = 0; i < coords.length; i++){
+        if(!isSafeCoord(coords[i], board)){
+            safeMoves.splice(i,1);
+        }
+    }
+    return safeMoves
+}
+
+//Input:
+//move - the move to be removed
+//Output:
+//goodMoves - a list of all moves without move
+function allBut(move){
+    let goodMoves = [...moves];
+    let badIndex = goodMoves.indexOf(move);
+    goodMoves.splice(badIndex,1);
+    return goodMoves;
 }
 
 //  This function is called everytime your snake is entered into a game.
@@ -103,26 +127,25 @@ app.post('/start', (request, response) => {
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
   var data = request.body;
-  var validMoves = [...moves];
-  var index = moves.indexOf(reverseMove(previousMove));
-  validMoves.splice(index,1);
+  var validMoves = allBut(reverseMove(previousMove));
   
-  var currentMove;
   var currentCoord = data.you.body[0];
-  for(;;){
-      let i = Math.floor(Math.random() * validMoves.length);
-      if(isSafeCoord(moveToCoord(validMoves[i], currentCoord),data.board)){
-          currentMove = validMoves[i];
-          break;
-      }else{
-          validMoves.splice(i,1);
+  let safe = safeMoves(validMoves, currentCoord, data.board);
+  var maxNumChoices = 0;
+  for(let i = 0; i < safe.length; i++){
+      let possibleMove = safe[i];
+      let secondaryMoves = allBut(reverseMove(possibleMove));
+      let numChoices = safeMoves(secondaryMoves, moveToCoord(possibleMove, currentCoord), data.board).length;
+      if (numChoices > maxNumChoices){
+          currentMove = possibleMove;
+          maxNumChoices = numChoices;
       }
   }
   
-  console.log("CURRENT HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
-  console.log("CURRENT TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
   previousMove = currentMove;
-  console.log("MOVE: " + currentMove );
+  console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
+  console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
+  console.log(data.you.id +" MOVE: " + currentMove );
   return response.json({ move: currentMove })
 })
 
