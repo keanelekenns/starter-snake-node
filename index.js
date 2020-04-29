@@ -141,7 +141,7 @@ app.post('/move', (request, response) => {
           currentMove = possibleMove;
           maxNumChoices = numChoices;
       }
-      console.log(potentialMove + " numChoices after: " + numChoices);
+      console.log(possibleMove + " numChoices after: " + numChoices);
   }
   
   previousMove = currentMove;
