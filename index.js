@@ -63,14 +63,15 @@ function reverseMove(move){
 }
 
 function isSafeCoord(coord, board){
+    //check boundary
     if(coord.x < 0 || coord.y < 0 || coord.x >= board.width || coord.y >= board.height){
         return false;
     }
+    //check snakes
     let numSnakes = board.snakes.length;
     for (let i=0; i < numSnakes; i++){
         let currentSnake = board.snakes[i];
-        let snakeSize = currentSnake.body.length;
-        for(let j = 0; j < snakeSize; j++){
+        for(let j = 0; j < currentSnake.body.length; j++){
             if(currentSnake.body[j].x == coord.x && currentSnake.body[j].y == coord.y){
                 return false;
             }
@@ -85,11 +86,11 @@ function isSafeCoord(coord, board){
 //Output:
 //safeMoves - a subset of the moves list containing only safe moves
 function safeMoves(potentialMoves, startCoord, board){
-    let safeMoves = [...potentialMoves];
-    let coords = safeMoves.map( function(x) { return moveToCoord(x, startCoord); });
+    let safeMoves = [];
+    let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
-        if(!isSafeCoord(coords[i], board)){
-            safeMoves.splice(i,1);
+        if(isSafeCoord(coords[i], board)){
+            safeMoves.push(potentialMoves[i]);
         }
     }
     return safeMoves
