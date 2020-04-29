@@ -41,6 +41,7 @@ function moveToCoord(move, currentCoord){
         newCoord.x++;
         break;
       default:
+        console.log("BAD COORD CONVERSION");
         return null;
     }
     //console.log("NEW COORD: (" + newCoord.x +"," +newCoord.y+")");
@@ -68,8 +69,7 @@ function isSafeCoord(coord, board){
         return false;
     }
     //check snakes
-    let numSnakes = board.snakes.length;
-    for (let i=0; i < numSnakes; i++){
+    for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
         for(let j = 0; j < currentSnake.body.length; j++){
             if(currentSnake.body[j].x == coord.x && currentSnake.body[j].y == coord.y){
@@ -89,6 +89,7 @@ function safeMoves(potentialMoves, startCoord, board){
     let safeMoves = [];
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
+        console.log("Potential Move : " + potentialMoves[i] + " (" + coords[i].x +"," + coords[i].y + ")");
         if(isSafeCoord(coords[i], board)){
             safeMoves.push(potentialMoves[i]);
         }
@@ -103,8 +104,21 @@ function safeMoves(potentialMoves, startCoord, board){
 function allBut(move){
     let goodMoves = [...moves];
     let badIndex = goodMoves.indexOf(move);
-    goodMoves.splice(badIndex,1);
+    if(badIndex >= 0){
+        goodMoves.splice(badIndex,1);
+    }else{
+        console.log("BAD MOVE");
+    }
     return goodMoves;
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = array[i]
+        array[i] = array[j]
+        array[j] = temp
+    }
 }
 
 //  This function is called everytime your snake is entered into a game.
@@ -132,6 +146,7 @@ app.post('/move', (request, response) => {
   
   var currentCoord = data.you.body[0];
   let safe = safeMoves(validMoves, currentCoord, data.board);
+  //shuffle(safe);
   var maxNumChoices = 0;
   console.log("TURN: " + data.turn);
   console.log("Safe Moves: " + safe.length);
