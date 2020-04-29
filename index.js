@@ -132,6 +132,7 @@ app.post('/move', (request, response) => {
   var currentCoord = data.you.body[0];
   let safe = safeMoves(validMoves, currentCoord, data.board);
   var maxNumChoices = 0;
+  console.log("Safe Moves:");
   for(let i = 0; i < safe.length; i++){
       let possibleMove = safe[i];
       let secondaryMoves = allBut(reverseMove(possibleMove));
@@ -140,6 +141,7 @@ app.post('/move', (request, response) => {
           currentMove = possibleMove;
           maxNumChoices = numChoices;
       }
+      console.log(potentialMove + " numChoices after: " + numChoices);
   }
   
   previousMove = currentMove;
