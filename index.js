@@ -146,7 +146,7 @@ app.post('/move', (request, response) => {
   
   var currentCoord = data.you.body[0];
   let safe = safeMoves(validMoves, currentCoord, data.board);
-  //shuffle(safe);
+  shuffle(safe);
   var maxNumChoices = 0;
   console.log("TURN: " + data.turn);
   console.log("Safe Moves: " + safe.length);
