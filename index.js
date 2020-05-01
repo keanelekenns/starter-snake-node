@@ -20,8 +20,8 @@ app.use(bodyParser.json())
 app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
-var currentMove;
-var previousMove = "up";
+var currentMoves = {};
+var previousMoves = {};
 const moves = ["up", "down", "left", "right"]
 
 function moveToCoord(move, currentCoord){
@@ -126,7 +126,9 @@ function shuffle(array) {
 // TODO: Use this function to decide how your snake is going to look on the board.
 app.post('/start', (request, response) => {
   console.log("START");
-
+  let j = Math.floor(Math.random()*4);
+  previousMoves[request.body.you.id] = moves[j];
+  currentMoves[request.body.you.id] = moves[j];
   // Response data
   const data = {
     color: '#4DC8FF',
@@ -142,7 +144,7 @@ app.post('/start', (request, response) => {
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
   var data = request.body;
-  var validMoves = allBut(reverseMove(previousMove));
+  var validMoves = allBut(reverseMove(previousMoves[data.you.id]));
   
   var currentCoord = data.you.body[0];
   let safe = safeMoves(validMoves, currentCoord, data.board);
@@ -155,17 +157,17 @@ app.post('/move', (request, response) => {
       let secondaryMoves = allBut(reverseMove(possibleMove));
       let numChoices = safeMoves(secondaryMoves, moveToCoord(possibleMove, currentCoord), data.board).length;
       if (numChoices > maxNumChoices){
-          currentMove = possibleMove;
+          currentMoves[data.you.id] = possibleMove;
           maxNumChoices = numChoices;
       }
       console.log(possibleMove + " numChoices after: " + numChoices);
   }
   
-  previousMove = currentMove;
+  previousMoves[data.you.id] = currentMoves[data.you.id];
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
-  console.log(data.you.id +" MOVE: " + currentMove );
-  return response.json({ move: currentMove })
+  console.log(data.you.id +" MOVE: " + currentMoves[data.you.id] );
+  return response.json({ move: currentMoves[data.you.id] })
 })
 
 // This function is called when a game your snake was in ends.
