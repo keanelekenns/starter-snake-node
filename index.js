@@ -93,33 +93,26 @@ function shuffle(array) {
 }
 
 function boardToGrid(board){
-    console.log("HELLO?");
     let grid = {};
-    console.log(JSON.stringify(board, null, 4));
     console.log(board.snakes.length);
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
-        //console.log(...currentSnake);
         for(let j = 0; j < currentSnake.body.length; j++){
             let coord = currentSnake.body[j];
             if(!(coord.x in grid)){
-                console.log("NEW X COORD: " + coord.x);
                 grid[coord.x]={};
             }
-            console.log("Snake at (" + coord.x+"," +coord.y+")");
             grid[coord.x][coord.y] = -1*((currentSnake.body.length - j)/board.snakes.length);
         }
     }
     for (let i = 0; i < board.food.length; i++){
         let coord = board.food[i];
         if(!(coord.x in grid)){
-            console.log("NEW X COORD: " + coord.x);
             grid[coord.x]={};
         }
-        console.log("Food at (" + coord.x+"," +coord.y+")");
         grid[coord.x][coord.y] = board.snakes.length;
     }
-    console.log("FINISHED GRID");
+    console.log(JSON.stringify(grid));
     return grid;
 }
 
@@ -169,9 +162,9 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
 function bestPath(startCoord, potentialMoves, board, n){
     let choice;
     let maxScore = Number.NEGATIVE_INFINITY;
-    console.log("BEFORE GRID");
     let grid = boardToGrid(board);
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
+    console.log(coords);
     for(let i = 0; i < coords.length; i++){
         let pathScore = pathScore(coords[i], allBut(reverse(potentialMoves[i])), board, grid, n);
         console.log("Path \""+potentialMoves[i] +"\" has score of "+pathScore);
