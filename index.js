@@ -122,9 +122,6 @@ function boardToGrid(board){
 //Output:
 //pathScore - an integer representing this path's score (higher is better)
 function pathScore(startCoord, potentialMoves, board, grid, n){
-    if(n==0){
-        return 0;
-    }
     if(!(inBounds(startCoord,board))){
         return -1;
     }
@@ -147,12 +144,16 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
         score += 1;
     }
     
+    if(n==1){
+        return score;
+    }
+    
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
         let pathScore = pathScore(coords[i], allBut(reverse(potentialMoves[i])), board, grid, n-1);
         score+=pathScore;
     }
-    return pathScore;
+    return score;
 }
 
 function bestPath(startCoord, potentialMoves, board, n){
@@ -168,7 +169,7 @@ function bestPath(startCoord, potentialMoves, board, n){
         }
     }
     if(!choice){
-        choice = "up"; //no good choices
+        choice = "up"; //no choices
     }
     return choice;
 }
@@ -199,9 +200,7 @@ app.post('/move', (request, response) => {
   let currentCoord = data.you.body[0];
   shuffle(potentialMoves);
   
-  //currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 4);
-  let j = Math.floor(Math.random()*4);
-  currentMoves[request.body.you.id] = moves[j];
+  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 3);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
