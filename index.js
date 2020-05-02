@@ -199,7 +199,9 @@ app.post('/move', (request, response) => {
   let currentCoord = data.you.body[0];
   shuffle(potentialMoves);
   
-  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 4);
+  //currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 4);
+  let j = Math.floor(Math.random()*4);
+  currentMoves[request.body.you.id] = moves[j];
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
