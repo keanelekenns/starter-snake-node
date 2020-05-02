@@ -94,7 +94,6 @@ function shuffle(array) {
 
 function boardToGrid(board){
     let grid = {};
-    console.log(board.snakes.length);
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
         for(let j = 0; j < currentSnake.body.length; j++){
@@ -147,11 +146,12 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
         score += 1;
     }
     
-    if(n==1){
+    if(n<=1){
         return score;
     }
     
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
+    console.log(coords);
     for(let i = 0; i < coords.length; i++){
         let pathScore = pathScore(coords[i], allBut(reverse(potentialMoves[i])), board, grid, n-1);
         score+=pathScore;
@@ -206,7 +206,7 @@ app.post('/move', (request, response) => {
   let currentCoord = data.you.body[0];
   shuffle(potentialMoves);
   console.log("TURN: "+data.turn);
-  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 3);
+  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 2);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
