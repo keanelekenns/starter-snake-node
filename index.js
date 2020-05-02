@@ -95,11 +95,11 @@ function shuffle(array) {
 function boardToGrid(board){
     console.log("HELLO?");
     let grid = {};
-    //console.log(...board);
+    console.log(JSON.stringify(board, null, 4));
     console.log(board.snakes.length);
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
-        console.log(...currentSnake);
+        //console.log(...currentSnake);
         for(let j = 0; j < currentSnake.body.length; j++){
             let coord = currentSnake.body[j];
             if(!(coord.x in grid)){
@@ -119,7 +119,7 @@ function boardToGrid(board){
         console.log("Food at (" + coord.x+"," +coord.y+")");
         grid[coord.x][coord.y] = board.snakes.length;
     }
-    console.log(...grid);
+    console.log("FINISHED GRID");
     return grid;
 }
 
