@@ -132,7 +132,7 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
     if(startCoord.x in grid){
         if(startCoord.y in grid[startCoord.x]){
             let gridVal = grid[startCoord.x][startCoord.y];
-            if(gridVal =< 0){//either has a snake, or this coord has already been visited
+            if(gridVal <= 0){//either has a snake, or this coord has already been visited
                 return gridVal;
             }else{
                 score+=gridVal;//add incentive for food
