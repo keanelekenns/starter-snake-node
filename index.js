@@ -124,6 +124,7 @@ function boardToGrid(board){
 //Output:
 //pathScore - an integer representing this path's score (higher is better)
 function pathScore(startCoord, potentialMoves, board, grid, n){
+    console.log(JSON.stringify(grid));
     if(!(inBounds(startCoord,board))){
         return -1;
     }
