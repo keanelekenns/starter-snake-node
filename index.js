@@ -96,23 +96,27 @@ function boardToGrid(board){
     let grid = {};
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
-        console.log("Current Snake:\n" + ...currentSnake);
+        console.log(...currentSnake);
         for(let j = 0; j < currentSnake.body.length; j++){
             let coord = currentSnake.body[j];
             if(!(coord.x in grid)){
+                console.log("NEW X COORD: " + coord.x);
                 grid[coord.x]={};
             }
+            console.log("Snake at (" + coord.x+"," +coord.y+")");
             grid[coord.x][coord.y] = -1*((currentSnake.body.length - j)/board.snakes.length);
         }
     }
     for (let i = 0; i < board.food.length; i++){
         let coord = board.food[i];
         if(!(coord.x in grid)){
+            console.log("NEW X COORD: " + coord.x);
             grid[coord.x]={};
         }
+        console.log("Food at (" + coord.x+"," +coord.y+")");
         grid[coord.x][coord.y] = board.snakes.length;
     }
-    console.log("GRID:\n"...grid);
+    console.log(...grid);
     return grid;
 }
 
