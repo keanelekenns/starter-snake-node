@@ -163,6 +163,7 @@ function bestPath(startCoord, potentialMoves, board, n){
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
         let pathScore = pathScore(coords[i], allBut(reverse(potentialMoves[i])), board, grid, n);
+        console.log("Path \""+potentialMoves[i] +"\" has score of "+pathScore);
         if(pathScore > maxScore){
             maxScore = pathScore;
             choice = potentialMoves[i];
