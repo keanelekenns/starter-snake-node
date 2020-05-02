@@ -21,12 +21,10 @@ app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 var currentMoves = {};
-var previousMoves = {};
 const moves = ["up", "down", "left", "right"]
 
 function moveToCoord(move, currentCoord){
     var newCoord = {...currentCoord};
-    //console.log("OLD COORD: (" + newCoord.x +"," +newCoord.y+")");
     switch (move) {
       case 'up':
         newCoord.y--;
@@ -44,7 +42,6 @@ function moveToCoord(move, currentCoord){
         console.log("BAD COORD CONVERSION");
         return null;
     }
-    //console.log("NEW COORD: (" + newCoord.x +"," +newCoord.y+")");
     return newCoord;
 }
 
@@ -63,38 +60,11 @@ function reverseMove(move){
     }
 }
 
-function isSafeCoord(coord, board){
-    //check boundary
+function inBounds(coord, board){
     if(coord.x < 0 || coord.y < 0 || coord.x >= board.width || coord.y >= board.height){
         return false;
     }
-    //check snakes
-    for (let i=0; i < board.snakes.length; i++){
-        let currentSnake = board.snakes[i];
-        for(let j = 0; j < currentSnake.body.length; j++){
-            if(currentSnake.body[j].x == coord.x && currentSnake.body[j].y == coord.y){
-                return false;
-            }
-        }
-    }
     return true;
-}
-//Input:
-//potentialMoves - a list of moves to check
-//startCoord - where to move from
-//board - the current game board
-//Output:
-//safeMoves - a subset of the moves list containing only safe moves
-function safeMoves(potentialMoves, startCoord, board){
-    let safeMoves = [];
-    let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
-    for(let i = 0; i < coords.length; i++){
-        console.log("Potential Move : " + potentialMoves[i] + " (" + coords[i].x +"," + coords[i].y + ")");
-        if(isSafeCoord(coords[i], board)){
-            safeMoves.push(potentialMoves[i]);
-        }
-    }
-    return safeMoves
 }
 
 //Input:
@@ -121,13 +91,94 @@ function shuffle(array) {
     }
 }
 
+function boardToGrid(board){
+    let grid = {};
+    for (let i=0; i < board.snakes.length; i++){
+        let currentSnake = board.snakes[i];
+        for(let j = 0; j < currentSnake.body.length; j++){
+            let coord = currentSnake.body[j];
+            if(!(coord.x in grid)){
+                grid[coord.x]={};
+            }
+            grid[coord.x][coord.y] = -1*((currentSnake.body.length - j)/board.snakes.length);
+        }
+    }
+    for (let i = 0; i < board.food.length; i++){
+        let coord = food[i];
+        if(!(coord.x in grid)){
+            grid[coord.x]={};
+        }
+        grid[coord.x][coord.y] = board.snakes.length;
+    }
+    return grid;
+}
+
+//Input:
+//startCoord - where to move from
+//potentialMoves - a list of moves to check
+//board - the current game board
+//grid - the current game grid
+//n - the number of steps to check in the pathScore
+//Output:
+//pathScore - an integer representing this path's score (higher is better)
+function pathScore(startCoord, potentialMoves, board, grid, n){
+    if(n==0){
+        return 0;
+    }
+    if(!(inBounds(startCoord,board))){
+        return -1;
+    }
+    let score = 0;
+    if(startCoord.x in grid){
+        if(startCoord.y in grid[startCoord.x]){
+            let gridVal = grid[startCoord.x][startCoord.y];
+            if(gridVal =< 0){//either has a snake, or this coord has already been visited
+                return gridVal;
+            }else{
+                score+=gridVal;//add incentive for food
+            }
+        }else{
+            grid[startCoord.x][startCoord.y] = 0; //visited
+            score += 1;
+        }
+    }else{
+        grid[startCoord.x] = {};
+        grid[startCoord.x][startCoord.y] = 0; //visited
+        score += 1;
+    }
+    
+    let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
+    for(let i = 0; i < coords.length; i++){
+        let pathScore = pathScore(coords[i], allBut(reverse(potentialMoves[i])), board, grid, n-1);
+        score+=pathScore;
+    }
+    return pathScore;
+}
+
+function bestPath(startCoord, potentialMoves, board, n){
+    let choice;
+    let maxScore = Number.NEGATIVE_INFINITY;
+    let grid = boardToGrid(board);
+    let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
+    for(let i = 0; i < coords.length; i++){
+        let pathScore = pathScore(coords[i], allBut(reverse(potentialMoves[i])), board, grid, n);
+        if(pathScore > maxScore){
+            maxScore = pathScore;
+            choice = potentialMoves[i];
+        }
+    }
+    if(!choice){
+        choice = "up"; //no good choices
+    }
+    return choice;
+}
+
 //  This function is called everytime your snake is entered into a game.
 //  cherrypy.request.json contains information about the game that's about to be played.
 // TODO: Use this function to decide how your snake is going to look on the board.
 app.post('/start', (request, response) => {
   console.log("START");
   let j = Math.floor(Math.random()*4);
-  previousMoves[request.body.you.id] = moves[j];
   currentMoves[request.body.you.id] = moves[j];
   // Response data
   const data = {
@@ -143,27 +194,13 @@ app.post('/start', (request, response) => {
 // Valid moves are "up", "down", "left", or "right".
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
-  var data = request.body;
-  var validMoves = allBut(reverseMove(previousMoves[data.you.id]));
+  let data = request.body;
+  let potentialMoves = allBut(reverseMove(currentMoves[data.you.id]));
+  let currentCoord = data.you.body[0];
+  shuffle(potentialMoves);
   
-  var currentCoord = data.you.body[0];
-  let safe = safeMoves(validMoves, currentCoord, data.board);
-  shuffle(safe);
-  var maxNumChoices = 0;
-  console.log("TURN: " + data.turn);
-  console.log("Safe Moves: " + safe.length);
-  for(let i = 0; i < safe.length; i++){
-      let possibleMove = safe[i];
-      let secondaryMoves = allBut(reverseMove(possibleMove));
-      let numChoices = safeMoves(secondaryMoves, moveToCoord(possibleMove, currentCoord), data.board).length;
-      if (numChoices > maxNumChoices){
-          currentMoves[data.you.id] = possibleMove;
-          maxNumChoices = numChoices;
-      }
-      console.log(possibleMove + " numChoices after: " + numChoices);
-  }
+  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 4);
   
-  previousMoves[data.you.id] = currentMoves[data.you.id];
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
   console.log(data.you.id +" MOVE: " + currentMoves[data.you.id] );
