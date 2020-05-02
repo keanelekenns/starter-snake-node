@@ -127,6 +127,7 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
     if(!(inBounds(startCoord,board))){
         return -1;
     }
+    console.log("HELLO");
     let score = 0;
     if(startCoord.x in grid){
         if(startCoord.y in grid[startCoord.x]){
@@ -145,11 +146,11 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
         grid[startCoord.x][startCoord.y] = 0; //visited
         score += 1;
     }
-    
+    console.log("HI");
     if(n<=1){
         return score;
     }
-    
+    console.log("HOWDY");
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     console.log(coords);
     for(let i = 0; i < coords.length; i++){
