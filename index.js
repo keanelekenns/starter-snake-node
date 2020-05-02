@@ -197,11 +197,11 @@ app.post('/start', (request, response) => {
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
   let data = request.body;
-  console.log("TURN: "+data.turn);
+  
   let potentialMoves = allBut(reverseMove(currentMoves[data.you.id]));
   let currentCoord = data.you.body[0];
   shuffle(potentialMoves);
-  
+  console.log("TURN: "+data.turn);
   currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 3);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
