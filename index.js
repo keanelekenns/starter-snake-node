@@ -155,8 +155,8 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     console.log(coords);
     for(let i = 0; i < coords.length; i++){
-        let pathScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n-1);
-        score+=pathScore;
+        let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n-1);
+        score+=pScore;
     }
     return score;
 }
@@ -169,10 +169,10 @@ function bestPath(startCoord, potentialMoves, board, n){
     console.log(coords);
     for(let i = 0; i < coords.length; i++){
         console.log("Path: " + potentialMoves[i]);
-        let pathScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
-        console.log(pathScore);
-        if(pathScore > maxScore){
-            maxScore = pathScore;
+        let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
+        console.log(pScore);
+        if(pScore > maxScore){
+            maxScore = pScore;
             choice = potentialMoves[i];
         }
     }
