@@ -39,7 +39,7 @@ function moveToCoord(move, currentCoord){
         newCoord.x++;
         break;
       default:
-        console.log("BAD COORD CONVERSION");
+        console.log("Bad move given to moveToCoord");
         return null;
     }
     return newCoord;
@@ -56,6 +56,7 @@ function reverseMove(move){
       case 'right':
         return 'left';
       default:
+        console.log("Bad move given to reverseMove");
         return null;
     }
 }
@@ -77,7 +78,7 @@ function allBut(move){
     if(badIndex >= 0){
         goodMoves.splice(badIndex,1);
     }else{
-        console.log("BAD MOVE");
+        console.log("Bad move given to allBut");
     }
     return goodMoves;
 }
@@ -104,7 +105,7 @@ function boardToGrid(board){
         }
     }
     for (let i = 0; i < board.food.length; i++){
-        let coord = food[i];
+        let coord = board.food[i];
         if(!(coord.x in grid)){
             grid[coord.x]={};
         }
