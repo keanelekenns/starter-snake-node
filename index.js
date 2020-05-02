@@ -96,6 +96,7 @@ function boardToGrid(board){
     let grid = {};
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
+        console.log("Current Snake:\n" + ...currentSnake);
         for(let j = 0; j < currentSnake.body.length; j++){
             let coord = currentSnake.body[j];
             if(!(coord.x in grid)){
@@ -111,7 +112,7 @@ function boardToGrid(board){
         }
         grid[coord.x][coord.y] = board.snakes.length;
     }
-    console.log(...grid);
+    console.log("GRID:\n"...grid);
     return grid;
 }
 
