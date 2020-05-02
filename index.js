@@ -161,6 +161,7 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
 function bestPath(startCoord, potentialMoves, board, n){
     let choice;
     let maxScore = Number.NEGATIVE_INFINITY;
+    console.log("BEFORE GRID");
     let grid = boardToGrid(board);
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
