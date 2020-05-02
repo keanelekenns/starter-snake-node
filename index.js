@@ -111,6 +111,7 @@ function boardToGrid(board){
         }
         grid[coord.x][coord.y] = board.snakes.length;
     }
+    console.log(...grid);
     return grid;
 }
 
