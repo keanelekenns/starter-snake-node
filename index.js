@@ -94,6 +94,8 @@ function shuffle(array) {
 
 function boardToGrid(board){
     let grid = {};
+    console.log(...board);
+    console.log(board.snakes.length);
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
         console.log(...currentSnake);
