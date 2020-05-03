@@ -101,7 +101,7 @@ function boardToGrid(board){
             if(!(coord.x in grid)){
                 grid[coord.x]={};
             }
-            grid[coord.x][coord.y] = -1*((currentSnake.body.length - j)/board.snakes.length);
+            grid[coord.x][coord.y] = -1*((currentSnake.body.length - j)/currentSnake.body.length);
         }
     }
     for (let i = 0; i < board.food.length; i++){
