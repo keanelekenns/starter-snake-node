@@ -124,11 +124,9 @@ function boardToGrid(board){
 //Output:
 //pathScore - an integer representing this path's score (higher is better)
 function pathScore(startCoord, potentialMoves, board, grid, n){
-    console.log(JSON.stringify(grid));
     if(!(inBounds(startCoord,board))){
         return -1;
     }
-    console.log("HELLO");
     let score = 0;
     if(startCoord.x in grid){
         if(startCoord.y in grid[startCoord.x]){
@@ -147,13 +145,10 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
         grid[startCoord.x][startCoord.y] = 0; //visited
         score += 1;
     }
-    console.log("HI");
     if(n<=1){
         return score;
     }
-    console.log("HOWDY");
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
-    console.log(coords);
     for(let i = 0; i < coords.length; i++){
         let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n-1);
         score+=pScore;
@@ -166,7 +161,6 @@ function bestPath(startCoord, potentialMoves, board, n){
     let maxScore = Number.NEGATIVE_INFINITY;
     let grid = boardToGrid(board);
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
-    console.log(coords);
     for(let i = 0; i < coords.length; i++){
         console.log("Path: " + potentialMoves[i]);
         let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
