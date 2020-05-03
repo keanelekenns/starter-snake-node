@@ -162,12 +162,14 @@ function bestPath(startCoord, potentialMoves, board, n){
     let grid = boardToGrid(board);
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
-        console.log("Path: " + potentialMoves[i]);
-        let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
-        console.log(pScore);
-        if(pScore > maxScore){
-            maxScore = pScore;
-            choice = potentialMoves[i];
+        if(inBounds(coords[i],board)){
+            console.log("Path: " + potentialMoves[i]);
+            let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
+            console.log(pScore);
+            if(pScore > maxScore){
+                maxScore = pScore;
+                choice = potentialMoves[i];
+            }
         }
     }
     if(!choice){
