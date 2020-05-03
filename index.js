@@ -21,7 +21,6 @@ app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 var currentMoves = {};
-var visited = {};
 const moves = ["up", "down", "left", "right"]
 
 function moveToCoord(move, currentCoord){
@@ -108,14 +107,14 @@ function boardToGrid(board){
         if(!(tail.x in grid)){
             grid[tail.x]={};
         }
-        grid[tail.x][tail.y] = 1/(currentSnake.body.length);//take a chance going towards tail
+        grid[tail.x][tail.y] = 0.01/(currentSnake.body.length);//take a chance going towards tail
     }
     for (let i = 0; i < board.food.length; i++){
         let coord = board.food[i];
         if(!(coord.x in grid)){
             grid[coord.x]={};
         }
-        grid[coord.x][coord.y] = board.snakes.length;
+        grid[coord.x][coord.y] = board.snakes.length*(board.snakes.length - 1);
     }
     console.log(JSON.stringify(grid));
     return grid;
@@ -129,51 +128,50 @@ function boardToGrid(board){
 //n - the number of steps to check in the pathScore
 //Output:
 //pathScore - an integer representing this path's score (higher is better)
-function pathScore(startCoord, potentialMoves, data, grid, n){
-    if(!(inBounds(startCoord,data.board))){
+function pathScore(startCoord, potentialMoves, board, grid, n){
+    if(!(inBounds(startCoord,board))){
         return -n;
     }
     let score = 0;
-    
-    if(startCoord.x in visited[data.you.id]){
-        if(startCoord.y in visited[data.you.id][startCoord.x]){
-            return score; //already visited
-        }
-    }else{
-        visited[data.you.id][startCoord.x] = {};
-    }
-    visited[data.you.id][startCoord.x][startCoord.y] = true; //mark as visited
-    
     if(startCoord.x in grid){
         if(startCoord.y in grid[startCoord.x]){
-            score += grid[startCoord.x][startCoord.y]-1;
-            //add incentive for food or take away point for snakes and counteract next addition
+            let gridVal = grid[startCoord.x][startCoord.y];
+            if(gridVal == 0){//this coord has already been visited
+                return score;
+            }else{
+                score += gridVal;//add incentive for food or take away point for snakes
+            }
+        }else{
+            grid[startCoord.x][startCoord.y] = 0; //visited
+            score += 1;
         }
+    }else{
+        grid[startCoord.x] = {};
+        grid[startCoord.x][startCoord.y] = 0; //visited
+        score += 1;
     }
-    score += 1;
-    
     if(n<=1){
         return score;
     }
-    
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
-        score += pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), data, grid, n-1);
+        score += pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n-1);
     }
     return score;
 }
 
-function bestPath(startCoord, potentialMoves, data, n){
+function bestPath(startCoord, potentialMoves, board, n){
     let choice;
     let maxScore = Number.NEGATIVE_INFINITY;
-    let grid = boardToGrid(data.board);
+    let grid = boardToGrid(board);
+    grid[startCoord.x][startCoord.y] = 0;//don't be afraid of your own head
+    
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
-        if(inBounds(coords[i],data.board) && 
+        if(inBounds(coords[i],board) && 
         !(coords[i].x in grid && coords[i].y in grid[coords[i].x] && grid[coords[i].x][coords[i].y] < 0)){
-            
             console.log("Path: " + potentialMoves[i]);
-            let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), data, grid, n);
+            let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
             console.log(pScore);
             if(pScore > maxScore){
                 maxScore = pScore;
@@ -194,8 +192,6 @@ app.post('/start', (request, response) => {
   console.log("START");
   let j = Math.floor(Math.random()*4);
   currentMoves[request.body.you.id] = moves[j];
-  visited[request.body.you.id] = {};
-  
   // Response data
   const data = {
     color: '#4DC8FF',
@@ -211,14 +207,13 @@ app.post('/start', (request, response) => {
 // TODO: Use the information in cherrypy.request.json to decide your next move.
 app.post('/move', (request, response) => {
   let data = request.body;
-  visited[data.you.id] = {}; //clear visited map
   
   let potentialMoves = allBut(reverseMove(currentMoves[data.you.id]));
   let currentCoord = data.you.body[0];
   shuffle(potentialMoves);
   
   console.log("TURN: "+data.turn);
-  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data, 4);
+  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 4);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
@@ -231,7 +226,6 @@ app.post('/move', (request, response) => {
 app.post('/end', (request, response) => {
   console.log("END");
   delete currentMoves[request.body.you.id];
-  delete visited[request.body.you.id];
   return response.json({ message: "ok" });
 })
 
