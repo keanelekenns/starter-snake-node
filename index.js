@@ -125,16 +125,16 @@ function boardToGrid(board){
 //pathScore - an integer representing this path's score (higher is better)
 function pathScore(startCoord, potentialMoves, board, grid, n){
     if(!(inBounds(startCoord,board))){
-        return -1;
+        return -n;
     }
     let score = 0;
     if(startCoord.x in grid){
         if(startCoord.y in grid[startCoord.x]){
             let gridVal = grid[startCoord.x][startCoord.y];
-            if(gridVal <= 0){//either has a snake, or this coord has already been visited
-                return gridVal;
+            if(gridVal == 0){//this coord has already been visited
+                return score;
             }else{
-                score+=gridVal;//add incentive for food
+                score += gridVal;//add incentive for food or take away point for snakes
             }
         }else{
             grid[startCoord.x][startCoord.y] = 0; //visited
@@ -162,7 +162,8 @@ function bestPath(startCoord, potentialMoves, board, n){
     let grid = boardToGrid(board);
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
-        if(inBounds(coords[i],board)){
+        if(inBounds(coords[i],board) && 
+        !(coords[i].x in grid && coords[i].y in grid[coords[i].x] && grid[coords[i].x][coords[i].y] < 0)){
             console.log("Path: " + potentialMoves[i]);
             let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
             console.log(pScore);
