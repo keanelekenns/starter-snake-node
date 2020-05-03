@@ -96,13 +96,18 @@ function boardToGrid(board){
     let grid = {};
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
-        for(let j = 0; j < currentSnake.body.length; j++){
+        for(let j = 0; j < currentSnake.body.length - 1; j++){
             let coord = currentSnake.body[j];
             if(!(coord.x in grid)){
                 grid[coord.x]={};
             }
             grid[coord.x][coord.y] = -1*((currentSnake.body.length - j)/currentSnake.body.length);
         }
+        let tail = currentSnake.body[currentSnake.body.length - 1];
+        if(!(tail.x in grid)){
+            grid[tail.x]={};
+        }
+        grid[tail.x][tail.y] = 1/(currentSnake.body.length);//take a chance going towards tail
     }
     for (let i = 0; i < board.food.length; i++){
         let coord = board.food[i];
@@ -150,8 +155,7 @@ function pathScore(startCoord, potentialMoves, board, grid, n){
     }
     let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
-        let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n-1);
-        score+=pScore;
+        score += pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n-1);
     }
     return score;
 }
@@ -164,6 +168,7 @@ function bestPath(startCoord, potentialMoves, board, n){
     for(let i = 0; i < coords.length; i++){
         if(inBounds(coords[i],board) && 
         !(coords[i].x in grid && coords[i].y in grid[coords[i].x] && grid[coords[i].x][coords[i].y] < 0)){
+            
             console.log("Path: " + potentialMoves[i]);
             let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
             console.log(pScore);
@@ -205,8 +210,9 @@ app.post('/move', (request, response) => {
   let potentialMoves = allBut(reverseMove(currentMoves[data.you.id]));
   let currentCoord = data.you.body[0];
   shuffle(potentialMoves);
+  
   console.log("TURN: "+data.turn);
-  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 4);
+  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 3);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
