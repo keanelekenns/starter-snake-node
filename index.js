@@ -205,7 +205,7 @@ app.post('/move', (request, response) => {
   let currentCoord = data.you.body[0];
   shuffle(potentialMoves);
   console.log("TURN: "+data.turn);
-  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 2);
+  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 4);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
