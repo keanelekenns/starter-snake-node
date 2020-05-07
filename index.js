@@ -21,7 +21,57 @@ app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 var currentMoves = {};
-const moves = ["up", "down", "left", "right"]
+const moves = ["up", "right", "down", "left"]
+const offsets = {
+    up : getOffsets("up",7),
+    right : getOffsets("right",7),
+    down : getOffsets("down",7),
+    left : getOffsets("left",7),
+    
+    getOffsets : function(move, n){
+        var view = [];
+        n = Math.abs(n);
+        var bound = Math.floor(n/2);
+        switch (move) {
+          case 'up':
+            for(let i = -bound; i <= bound; i++){
+                for(let j = -1; j >= -n; j--){
+                    view.push([i,j]);
+                }
+            }
+            break;
+            
+          case 'left':
+            for(let i = -1; i >= -n; i--){
+                for(let j = -bound; j <= bound; j++){
+                    view.push([i,j]);
+                }
+            }
+            break;
+            
+          case 'down':
+            for(let i = -bound; i <= bound; i++){
+                for(let j = 1; j <= n; j++){
+                    view.push([i,j]);
+                }
+            }
+            break;
+            
+          case 'right':
+            for(let i = 1; i <= n; i++){
+                for(let j = -bound; j <= bound; j++){
+                    view.push([i,j]);
+                }
+            }
+            break;
+            
+          default:
+            console.log("Bad move given to getViewOffsets");
+            return null;
+        }
+        return view;
+    }
+}
 
 function moveToCoord(move, currentCoord){
     var newCoord = {...currentCoord};
@@ -61,6 +111,39 @@ function reverseMove(move){
     }
 }
 
+function clockwiseMove(move){
+    switch (move) {
+      case 'up':
+        return 'right';
+      case 'right':
+        return 'down';
+      case 'down':
+        return 'left';
+      case 'left':
+        return 'up';
+      default:
+        console.log("Bad move given to clockwiseMove");
+        return null;
+    }
+}
+
+function counterclockwiseMove(move){
+    switch (move) {
+      case 'up':
+        return 'left';
+      case 'left':
+        return 'down';
+      case 'down':
+        return 'right';
+      case 'right':
+        return 'up';
+      default:
+        console.log("Bad move given to counterclockwiseMove");
+        return null;
+    }
+}
+
+
 function inBounds(coord, board){
     if(coord.x < 0 || coord.y < 0 || coord.x >= board.width || coord.y >= board.height){
         return false;
@@ -94,6 +177,7 @@ function shuffle(array) {
 
 function boardToGrid(board){
     let grid = {};
+    //SNAKES
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
         for(let j = 0; j < currentSnake.body.length - 1; j++){
@@ -107,14 +191,15 @@ function boardToGrid(board){
         if(!(tail.x in grid)){
             grid[tail.x]={};
         }
-        grid[tail.x][tail.y] = 0.01/(currentSnake.body.length);//take a chance going towards tail
+        grid[tail.x][tail.y] = 0.001/(currentSnake.body.length);//take a chance going towards tail
     }
+    //FOOD
     for (let i = 0; i < board.food.length; i++){
         let coord = board.food[i];
         if(!(coord.x in grid)){
             grid[coord.x]={};
         }
-        grid[coord.x][coord.y] = board.snakes.length*(board.snakes.length - 1);
+        grid[coord.x][coord.y] = 5;
     }
     console.log(JSON.stringify(grid));
     return grid;
@@ -122,56 +207,49 @@ function boardToGrid(board){
 
 //Input:
 //startCoord - where to move from
-//potentialMoves - a list of moves to check
+//move - a move to check
 //board - the current game board
 //grid - the current game grid
-//n - the number of steps to check in the pathScore
 //Output:
 //pathScore - an integer representing this path's score (higher is better)
-function pathScore(startCoord, potentialMoves, board, grid, n){
-    if(!(inBounds(startCoord,board))){
-        return -n;
-    }
+function pathScore(startCoord, move, board, grid){
     let score = 0;
-    if(startCoord.x in grid){
-        if(startCoord.y in grid[startCoord.x]){
-            let gridVal = grid[startCoord.x][startCoord.y];
-            if(gridVal == 0){//this coord has already been visited
-                return score;
+    let offsetArray = offsets[move];
+    
+    for(offset in offsetArray){
+        let coord = {x:startCoord.x + offset[0], y: startCoord.y + offset[1]};
+        
+        if(!(inBounds(coord,board))){
+            score += -1/n;
+            continue;
+        }
+        if(coord.x in grid){
+            if(coord.y in grid[coord.x]){
+                let gridVal = grid[coord.x][coord.y];
+                score += gridVal;
             }else{
-                score += gridVal;//add incentive for food or take away point for snakes
+                score += 1;
             }
         }else{
-            grid[startCoord.x][startCoord.y] = 0; //visited
             score += 1;
         }
-    }else{
-        grid[startCoord.x] = {};
-        grid[startCoord.x][startCoord.y] = 0; //visited
-        score += 1;
     }
-    if(n<=1){
-        return score;
-    }
-    let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
-    for(let i = 0; i < coords.length; i++){
-        score += pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n-1);
-    }
+    
     return score;
 }
 
-function bestPath(startCoord, potentialMoves, board, n){
+function bestPath(startCoord, forwardMove, board){
     let choice;
     let maxScore = Number.NEGATIVE_INFINITY;
     let grid = boardToGrid(board);
-    grid[startCoord.x][startCoord.y] = 0;//don't be afraid of your own head
+    let possibleMoves = [forwardMove, counterclockwiseMove(forwardMove), clockwiseMove(forwardMove)];
+    let coords = possibleMoves.map(function(x){return moveToCoord(x, startCoord)};);
     
-    let coords = potentialMoves.map( function(x) { return moveToCoord(x, startCoord); });
     for(let i = 0; i < coords.length; i++){
         if(inBounds(coords[i],board) && 
         !(coords[i].x in grid && coords[i].y in grid[coords[i].x] && grid[coords[i].x][coords[i].y] < 0)){
             console.log("Path: " + potentialMoves[i]);
-            let pScore = pathScore(coords[i], allBut(reverseMove(potentialMoves[i])), board, grid, n);
+            let pScore = pathScore(startCoord, potentialMoves[i], board, grid);
             console.log(pScore);
             if(pScore > maxScore){
                 maxScore = pScore;
@@ -208,12 +286,11 @@ app.post('/start', (request, response) => {
 app.post('/move', (request, response) => {
   let data = request.body;
   
-  let potentialMoves = allBut(reverseMove(currentMoves[data.you.id]));
+  //let potentialMoves = allBut(reverseMove(currentMoves[data.you.id]));
   let currentCoord = data.you.body[0];
-  shuffle(potentialMoves);
   
   console.log("TURN: "+data.turn);
-  currentMoves[data.you.id] = bestPath(currentCoord, potentialMoves, data.board, 4);
+  currentMoves[data.you.id] = bestPath(currentCoord, currentMoves[data.you.id], data.board);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
   console.log(data.you.id + " TAIL: (" + data.you.body[data.you.body.length - 1].x +","+data.you.body[data.you.body.length - 1].y+")");
