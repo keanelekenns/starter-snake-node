@@ -219,7 +219,7 @@ function pathScore(startCoord, move, board, grid){
     let offset;
     for(offset of offsetArray){
         let coord = {x:startCoord.x + offset[0], y: startCoord.y + offset[1]};
-        //console.log(coord.x + " " + coord.y);
+        console.log(coord.x + " " + coord.y);
         if(!(inBounds(coord,board))){
             score += -1/n;
             continue;
