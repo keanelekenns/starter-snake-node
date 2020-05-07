@@ -292,9 +292,6 @@ app.post('/move', (request, response) => {
   let currentCoord = data.you.body[0];
   
   console.log("TURN: "+data.turn);
-  for(let i = 0; i < 100000000000000000; i++){
-      //timeout
-  }
   currentMoves[data.you.id] = bestPath(currentCoord, currentMoves[data.you.id], data.board);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
