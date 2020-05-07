@@ -216,6 +216,7 @@ function pathScore(startCoord, move, board, grid){
     let score = 0;
     let offsetArray = offsets[move];
     console.log(offsetArray);
+    let offset;
     for(offset of offsetArray){
         let coord = {x:startCoord.x + offset[0], y: startCoord.y + offset[1]};
         //console.log(coord.x + " " + coord.y);
