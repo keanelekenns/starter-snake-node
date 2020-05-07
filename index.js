@@ -249,14 +249,15 @@ function bestPath(startCoord, forwardMove, board){
     for(let i = 0; i < coords.length; i++){
         if(inBounds(coords[i],board) && 
         !(coords[i].x in grid && coords[i].y in grid[coords[i].x] && grid[coords[i].x][coords[i].y] < 0)){
-            console.log("Path: " + potentialMoves[i]);
-            let pScore = pathScore(startCoord, potentialMoves[i], board, grid);
+            console.log("Path: " + possibleMoves[i]);
+            let pScore = pathScore(startCoord, possibleMoves[i], board, grid);
             console.log(pScore);
             if(pScore > maxScore){
                 maxScore = pScore;
                 choice = potentialMoves[i];
             }
         }
+        
     }
     if(!choice){
         choice = "up"; //no choices
