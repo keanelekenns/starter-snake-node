@@ -23,10 +23,10 @@ app.use(poweredByHandler)
 var currentMoves = {};
 const moves = ["up", "right", "down", "left"];
 const offsets = {
-    up : getOffsets("up",7),
-    right : getOffsets("right",7),
-    down : getOffsets("down",7),
-    left : getOffsets("left",7)
+    up : getOffsets("up",3),
+    right : getOffsets("right",3),
+    down : getOffsets("down",3),
+    left : getOffsets("left",3)
 }
 
 function getOffsets(move, n){
@@ -215,7 +215,6 @@ function boardToGrid(board){
 function pathScore(startCoord, move, board, grid){
     let score = 0;
     let offsetArray = offsets[move];
-    console.log(offsetArray);
     let offset;
     for(offset of offsetArray){
         let coord = {x:startCoord.x + offset[0], y: startCoord.y + offset[1]};
