@@ -23,10 +23,6 @@ app.use(poweredByHandler)
 var currentMoves = {};
 const moves = ["up", "right", "down", "left"]
 const offsets = {
-    up : getOffsets("up",7),
-    right : getOffsets("right",7),
-    down : getOffsets("down",7),
-    left : getOffsets("left",7),
     
     getOffsets : function(move, n){
         var view = [];
@@ -70,7 +66,11 @@ const offsets = {
             return null;
         }
         return view;
-    }
+    },
+    up : getOffsets("up",7),
+    right : getOffsets("right",7),
+    down : getOffsets("down",7),
+    left : getOffsets("left",7)
 }
 
 function moveToCoord(move, currentCoord){
