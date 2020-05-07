@@ -254,7 +254,7 @@ function bestPath(startCoord, forwardMove, board){
             console.log(pScore);
             if(pScore > maxScore){
                 maxScore = pScore;
-                choice = potentialMoves[i];
+                choice = possibleMoves[i];
             }
         }
         console.log(i);
@@ -292,6 +292,9 @@ app.post('/move', (request, response) => {
   let currentCoord = data.you.body[0];
   
   console.log("TURN: "+data.turn);
+  for(let i = 0; i < 100000000000000000; i++){
+      //timeout
+  }
   currentMoves[data.you.id] = bestPath(currentCoord, currentMoves[data.you.id], data.board);
   
   console.log(data.you.id + " HEAD: (" + data.you.body[0].x +","+data.you.body[0].y+")");
