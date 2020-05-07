@@ -221,7 +221,7 @@ function pathScore(startCoord, move, board, grid){
         let coord = {x:startCoord.x + offset[0], y: startCoord.y + offset[1]};
         console.log(coord.x + " " + coord.y);
         if(!(inBounds(coord,board))){
-            score += -1/n;
+            score += -1/board.height;
             continue;
         }
         if(coord.x in grid){
