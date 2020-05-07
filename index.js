@@ -21,56 +21,56 @@ app.use(poweredByHandler)
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 var currentMoves = {};
-const moves = ["up", "right", "down", "left"]
+const moves = ["up", "right", "down", "left"];
 const offsets = {
-    
-    getOffsets : function(move, n){
-        var view = [];
-        n = Math.abs(n);
-        var bound = Math.floor(n/2);
-        switch (move) {
-          case 'up':
-            for(let i = -bound; i <= bound; i++){
-                for(let j = -1; j >= -n; j--){
-                    view.push([i,j]);
-                }
-            }
-            break;
-            
-          case 'left':
-            for(let i = -1; i >= -n; i--){
-                for(let j = -bound; j <= bound; j++){
-                    view.push([i,j]);
-                }
-            }
-            break;
-            
-          case 'down':
-            for(let i = -bound; i <= bound; i++){
-                for(let j = 1; j <= n; j++){
-                    view.push([i,j]);
-                }
-            }
-            break;
-            
-          case 'right':
-            for(let i = 1; i <= n; i++){
-                for(let j = -bound; j <= bound; j++){
-                    view.push([i,j]);
-                }
-            }
-            break;
-            
-          default:
-            console.log("Bad move given to getViewOffsets");
-            return null;
-        }
-        return view;
-    },
     up : getOffsets("up",7),
     right : getOffsets("right",7),
     down : getOffsets("down",7),
     left : getOffsets("left",7)
+}
+
+function getOffsets(move, n){
+    var view = [];
+    n = Math.abs(n);
+    var bound = Math.floor(n/2);
+    switch (move) {
+      case 'up':
+        for(let i = -bound; i <= bound; i++){
+            for(let j = -1; j >= -n; j--){
+                view.push([i,j]);
+            }
+        }
+        break;
+        
+      case 'left':
+        for(let i = -1; i >= -n; i--){
+            for(let j = -bound; j <= bound; j++){
+                view.push([i,j]);
+            }
+        }
+        break;
+        
+      case 'down':
+        for(let i = -bound; i <= bound; i++){
+            for(let j = 1; j <= n; j++){
+                view.push([i,j]);
+            }
+        }
+        break;
+        
+      case 'right':
+        for(let i = 1; i <= n; i++){
+            for(let j = -bound; j <= bound; j++){
+                view.push([i,j]);
+            }
+        }
+        break;
+        
+      default:
+        console.log("Bad move given to getViewOffsets");
+        return null;
+    }
+    return view;
 }
 
 function moveToCoord(move, currentCoord){
