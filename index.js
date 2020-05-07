@@ -243,7 +243,7 @@ function bestPath(startCoord, forwardMove, board){
     let maxScore = Number.NEGATIVE_INFINITY;
     let grid = boardToGrid(board);
     let possibleMoves = [forwardMove, counterclockwiseMove(forwardMove), clockwiseMove(forwardMove)];
-    let coords = possibleMoves.map(function(x){return moveToCoord(x, startCoord)};);
+    let coords = possibleMoves.map(function(x){return moveToCoord(x, startCoord);});
     
     for(let i = 0; i < coords.length; i++){
         if(inBounds(coords[i],board) && 
