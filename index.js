@@ -257,7 +257,7 @@ function bestPath(startCoord, forwardMove, board){
                 choice = potentialMoves[i];
             }
         }
-        
+        console.log(i);
     }
     if(!choice){
         choice = "up"; //no choices
