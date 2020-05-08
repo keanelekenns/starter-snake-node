@@ -177,21 +177,18 @@ function shuffle(array) {
 
 function boardToGrid(board){
     let grid = {};
+    let snakeBlocks = 0;
     //SNAKES
     for (let i=0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
         for(let j = 0; j < currentSnake.body.length - 1; j++){
             let coord = currentSnake.body[j];
+            snakeBlocks++;
             if(!(coord.x in grid)){
                 grid[coord.x]={};
             }
-            grid[coord.x][coord.y] = -1*((currentSnake.body.length - j)/currentSnake.body.length);
+            grid[coord.x][coord.y] = -1-((currentSnake.body.length - j)/currentSnake.body.length);
         }
-        let tail = currentSnake.body[currentSnake.body.length - 1];
-        if(!(tail.x in grid)){
-            grid[tail.x]={};
-        }
-        grid[tail.x][tail.y] = 0.001/(currentSnake.body.length);//take a chance going towards tail
     }
     //FOOD
     for (let i = 0; i < board.food.length; i++){
@@ -199,7 +196,7 @@ function boardToGrid(board){
         if(!(coord.x in grid)){
             grid[coord.x]={};
         }
-        grid[coord.x][coord.y] = 5;
+        grid[coord.x][coord.y] = 1 + board.snakes.length/snakeBlocks;
     }
     console.log(JSON.stringify(grid));
     return grid;
@@ -218,22 +215,10 @@ function pathScore(startCoord, move, board, grid){
     let offset;
     for(offset of offsetArray){
         let coord = {x:startCoord.x + offset[0], y: startCoord.y + offset[1]};
-        console.log(coord.x + " " + coord.y);
-        if(!(inBounds(coord,board))){
-            continue;
-        }
-        if(coord.x in grid){
-            if(coord.y in grid[coord.x]){
-                let gridVal = grid[coord.x][coord.y];
-                score += gridVal;
-            }else{
-                score += 1;
-            }
-        }else{
-            score += 1;
+        if(coord.x in grid && coord.y in grid[coord.x]){
+            score += grid[coord.x][coord.y];
         }
     }
-    
     return score;
 }
 
