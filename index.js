@@ -23,10 +23,10 @@ app.use(poweredByHandler)
 var currentMoves = {};
 const moves = ["up", "right", "down", "left"];
 const offsets = {
-    up : getOffsets("up",5),
-    right : getOffsets("right",5),
-    down : getOffsets("down",5),
-    left : getOffsets("left",5)
+    up : getOffsets("up",4),
+    right : getOffsets("right",4),
+    down : getOffsets("down",4),
+    left : getOffsets("left",4)
 }
 
 function getOffsets(move, n){
@@ -175,7 +175,7 @@ function shuffle(array) {
     }
 }
 
-function boardToGrid(board){
+function boardToGrid(board, currentCoord){
     let grid = {};
     let snakeBlocks = 0;
     //SNAKES
@@ -187,7 +187,7 @@ function boardToGrid(board){
             if(!(coord.x in grid)){
                 grid[coord.x]={};
             }
-            grid[coord.x][coord.y] = -1-((currentSnake.body.length - j)/currentSnake.body.length);
+            grid[coord.x][coord.y] = -((currentSnake.body.length - j)/currentSnake.body.length);
         }
     }
     //FOOD
@@ -196,7 +196,12 @@ function boardToGrid(board){
         if(!(coord.x in grid)){
             grid[coord.x]={};
         }
-        grid[coord.x][coord.y] = 1 + board.snakes.length/snakeBlocks;
+        let dist = Math.abs(coord.x - currentCoord.x) + Math.abs(coord.y - currentCoord.y);
+        if(board.snakes.length/snakeBlocks < 0.1){
+            grid[coord.x][coord.y] = board.snakes.length/(snakeBlocks*dist);
+        }else{
+            grid[coord.x][coord.y] = 1/dist + board.snakes.length/snakeBlocks;
+        }
     }
     console.log(JSON.stringify(grid));
     return grid;
@@ -225,7 +230,7 @@ function pathScore(startCoord, move, board, grid){
 function bestPath(startCoord, forwardMove, board){
     let choice;
     let maxScore = Number.NEGATIVE_INFINITY;
-    let grid = boardToGrid(board);
+    let grid = boardToGrid(board, startCoord);
     let possibleMoves = [forwardMove, counterclockwiseMove(forwardMove), clockwiseMove(forwardMove)];
     let coords = possibleMoves.map(function(x){return moveToCoord(x, startCoord);});
     console.log(possibleMoves);
