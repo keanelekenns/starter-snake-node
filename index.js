@@ -23,10 +23,10 @@ app.use(poweredByHandler)
 var currentMoves = {};
 const moves = ["up", "right", "down", "left"];
 const offsets = {
-    up : getOffsets("up",3),
-    right : getOffsets("right",3),
-    down : getOffsets("down",3),
-    left : getOffsets("left",3)
+    up : getOffsets("up",5),
+    right : getOffsets("right",5),
+    down : getOffsets("down",5),
+    left : getOffsets("left",5)
 }
 
 function getOffsets(move, n){
@@ -220,7 +220,6 @@ function pathScore(startCoord, move, board, grid){
         let coord = {x:startCoord.x + offset[0], y: startCoord.y + offset[1]};
         console.log(coord.x + " " + coord.y);
         if(!(inBounds(coord,board))){
-            score += -1/board.height;
             continue;
         }
         if(coord.x in grid){
