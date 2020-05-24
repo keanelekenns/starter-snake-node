@@ -178,9 +178,12 @@ function allBut(move){
 function boardToGrid(board, currentCoord, myId){
     let grid = {};
     let snakeBlocks = 0;
+    console.log(myId);
     //SNAKES
     for (let i = 0; i < board.snakes.length; i++){
         let currentSnake = board.snakes[i];
+        console.log(currentSnake.id);
+        console.log(currentSnake.equals(myId));
         if(currentSnake.id.equals(myId)){
             for(let j = 0; j < currentSnake.body.length - 1; j++){
                 let coord = currentSnake.body[j];
