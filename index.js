@@ -189,6 +189,7 @@ function boardToGrid(board, currentCoord, myId){
                     grid[coord.x]={};
                 }
                 grid[coord.x][coord.y] = -(j+1)*Number.MIN_VALUE;
+                console.log(grid[coord.x][coord.y]);
             }
             continue;
         }
